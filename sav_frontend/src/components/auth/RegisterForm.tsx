@@ -468,6 +468,22 @@ const RegisterForm: React.FC = () => {
             >
               Veuillez vérifier vos informations avant de finaliser
             </Alert>
+            <Alert 
+  severity="info" 
+  sx={{ 
+    mb: 2,
+    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+    border: '1px solid rgba(33, 150, 243, 0.3)',
+    color: '#fff',
+    borderRadius: '12px',
+  }}
+>
+  Après l'inscription, vous recevrez un email de confirmation dans Mailtrap.
+  <br />
+  Veuillez vérifier votre boîte de réception pour activer votre compte.
+</Alert>
+
+            
             
             <Box 
               sx={{ 

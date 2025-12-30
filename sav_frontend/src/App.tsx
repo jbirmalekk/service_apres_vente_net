@@ -23,6 +23,11 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 import UsersPage from './pages/dashboard/UsersPage';
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
+import ConfirmEmail from './components/auth/ConfirmEmail';
 
 // Mock pages pour la démo
 import ArticlesPage from './pages/dashboard/ArticlesPage';
@@ -59,7 +64,10 @@ function AppContent() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="register" element={<RegisterForm />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="confirm-email" element={<ConfirmEmail />} />
         </Route>
 
         {/* Protected routes: MainLayout is only mounted when authenticated */}
