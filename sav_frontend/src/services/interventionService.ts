@@ -1,5 +1,6 @@
 // services/interventionService.ts
 import { Intervention, InterventionStats, InterventionFilterParams } from '../types/intervention';
+import { authInterceptor } from './authInterceptor';
 
 // Utilise la gateway par défaut pour aligner les autres services (clients/réclamations)
 const BASE = (import.meta.env.VITE_INTERVENTION_API_BASE
@@ -52,12 +53,15 @@ const buildQuery = (params: Record<string, any>) => {
 };
 
 const fetchJson = async (path: string, init?: RequestInit) => {
-  const res = await fetch(`${BASE}${path}`, {
-    credentials: 'include',
-    ...init,
-    headers: { ...getAuthHeaders(), ...(init?.headers || {}) },
-  });
-  return handleResponse(res);
+  try {
+    const response = await authInterceptor.fetchWithAuth(`${BASE}${path}`, init);
+    return handleResponse(response);
+  } catch (error: any) {
+    if (error.message && error.message.includes('Session expirée')) {
+      window.location.href = '/login';
+    }
+    throw error;
+  }
 };
 
 export const interventionService = {

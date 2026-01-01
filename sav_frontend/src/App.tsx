@@ -22,6 +22,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
+import CheckoutPage from './pages/CheckoutPage';
 import UsersPage from './pages/dashboard/UsersPage';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
@@ -68,6 +69,7 @@ function AppContent() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
           <Route path="confirm-email" element={<ConfirmEmail />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
 
         {/* Protected routes: MainLayout is only mounted when authenticated */}
