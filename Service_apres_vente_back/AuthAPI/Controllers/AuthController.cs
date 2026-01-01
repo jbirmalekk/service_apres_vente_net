@@ -6,7 +6,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System.Web;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 52a75499f5ab7c10a9e213ce3b302c84c126c4a2
 namespace AuthAPI.Controllers
 {
     [Route("api/[controller]")]
