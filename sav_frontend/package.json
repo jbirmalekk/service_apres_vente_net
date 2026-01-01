@@ -20,6 +20,8 @@
     "@mui/utils": "^7.3.6",
     "@mui/x-data-grid": "^8.21.0",
     "@mui/x-date-pickers": "^8.22.1",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.0",
     "@tailwindcss/postcss": "^4.1.18",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",

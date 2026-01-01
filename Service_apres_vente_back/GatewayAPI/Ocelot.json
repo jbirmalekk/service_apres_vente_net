@@ -738,6 +738,40 @@
 }
     ,
 
+    // ========== STRIPE PAYMENT ========== 
+    {
+      "DownstreamPathTemplate": "/api/stripe/create-payment-intent",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7228
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/stripe/create-payment-intent",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/stripe/confirm-payment",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7228
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/stripe/confirm-payment",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
     // ========== TECHNICIENS ========== 
     {
       "DownstreamPathTemplate": "/api/techniciens",

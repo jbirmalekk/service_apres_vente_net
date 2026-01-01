@@ -328,6 +328,11 @@ namespace InterventionAPI.Models.Repositories
                 .Include(f => f.Intervention)
                 .FirstOrDefault(f => f.Id == id);
 
+        public async Task<Facture?> GetFactureByIdAsync(int id) =>
+            await _context.Factures
+                .Include(f => f.Intervention)
+                .FirstOrDefaultAsync(f => f.Id == id);
+
         public Facture? GetFactureByInterventionId(int interventionId) =>
             _context.Factures
                 .Include(f => f.Intervention)
@@ -371,6 +376,31 @@ namespace InterventionAPI.Models.Repositories
                 existing.DescriptionServices = facture.DescriptionServices;
 
                 _context.SaveChanges();
+            }
+            return existing;
+        }
+
+        public async Task<Facture> UpdateFactureAsync(Facture facture)
+        {
+            var existing = await _context.Factures
+                .Include(f => f.Intervention)
+                .FirstOrDefaultAsync(f => f.Id == facture.Id);
+
+            if (existing != null)
+            {
+                existing.NumeroFacture = facture.NumeroFacture;
+                existing.DateFacture = facture.DateFacture;
+                existing.ClientNom = facture.ClientNom;
+                existing.ClientAdresse = facture.ClientAdresse;
+                existing.ClientEmail = facture.ClientEmail;
+                existing.MontantHT = facture.MontantHT;
+                existing.TVA = facture.TVA;
+                existing.Statut = facture.Statut;
+                existing.DatePaiement = facture.DatePaiement;
+                existing.ModePaiement = facture.ModePaiement;
+                existing.DescriptionServices = facture.DescriptionServices;
+
+                await _context.SaveChangesAsync();
             }
             return existing;
         }

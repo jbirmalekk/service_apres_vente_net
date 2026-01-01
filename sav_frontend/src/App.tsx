@@ -69,11 +69,10 @@ function AppContent() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
           <Route path="confirm-email" element={<ConfirmEmail />} />
-<<<<<<< HEAD
-          <Route path="/checkout" element={<CheckoutPage />} />
-=======
->>>>>>> 03e5043 (Rest_mdp)
         </Route>
+
+        {/* Checkout page uses a minimal standalone route (no AuthLayout) to render a simple centered form */}
+        <Route path="/checkout" element={<CheckoutPage />} />
 
         {/* Protected routes: MainLayout is only mounted when authenticated */}
         <Route element={isAuthenticated ? <MainLayout /> : <Navigate to="/login" replace />}>

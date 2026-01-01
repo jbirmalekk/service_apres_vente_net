@@ -18,11 +18,13 @@ namespace InterventionAPI.Models.Repositories
 
         // CRUD Factures
         Facture? GetFactureById(int id);
+        Task<Facture?> GetFactureByIdAsync(int id);
         Facture? GetFactureByInterventionId(int interventionId);
         Facture? GetFactureByNumero(string numero);
         IList<Facture> GetAllFactures();
         void AddFacture(Facture facture);
         Facture UpdateFacture(Facture facture);
+        Task<Facture> UpdateFactureAsync(Facture facture);
         void DeleteFacture(int id);
 
         // Méthodes spécifiques
