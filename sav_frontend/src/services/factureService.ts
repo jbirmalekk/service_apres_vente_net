@@ -94,6 +94,53 @@ export const factureService = {
 
   changeStatus: async (id: number, statut: string): Promise<Facture> =>
     fetchJson(`/${id}/changer-statut`, { method: 'PUT', body: JSON.stringify(statut) }),
+
+  // Payment: create a payment session (backend should return an URL to redirect the user)
+  createPaymentSession: async (id: number): Promise<{ url: string }> => {
+    try {
+      const API_ROOT = import.meta.env.VITE_API_GATEWAY || 'https://localhost:7076/apigateway';
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error("Token d'authentification manquant. Veuillez vous reconnecter.");
+      }
+
+      const res = await fetch(`${API_ROOT}/interventions/factures/${id}/create-payment-session`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('token');
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Erreur HTTP ${res.status}: ${errorText || 'Erreur inconnue'}`);
+      }
+
+      return await res.json();
+    } catch (error: any) {
+      console.error('Erreur création session paiement:', error);
+      throw new Error(error.message || "Impossible de créer la session de paiement");
+    }
+  },
+  confirmPayment: async (id: number, payload: any): Promise<any> => {
+    const API_ROOT = (import.meta.env.VITE_INTERVENTION_API_BASE || import.meta.env.VITE_API_BASE_URL || 'https://localhost:7228/api').replace(/\/$/, '');
+    const res = await fetch(`${API_ROOT}/interventions/factures/${id}/confirm-payment`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders() },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+    return handleResponse(res as Response);
+  },
 };
 
 export default factureService;

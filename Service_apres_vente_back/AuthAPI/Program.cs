@@ -29,7 +29,12 @@ builder.Services.AddCors(options =>
 // Configure Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Ajouter la configuration des paramètres email
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<MailtrapSettings>(builder.Configuration.GetSection("MailSettings:Mailtrap"));
 
+// Ajouter le service d'email
+builder.Services.AddTransient<IEmailService, EmailService>();
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

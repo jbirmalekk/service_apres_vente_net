@@ -692,6 +692,51 @@
       }
     }
     ,
+    {
+  "DownstreamPathTemplate": "/api/interventions/factures/{id}/create-payment-session",
+  "DownstreamScheme": "https",
+  "DownstreamHostAndPorts": [
+    {
+      "Host": "localhost",
+      "Port": 7228
+    }
+  ],
+  "UpstreamPathTemplate": "/apigateway/interventions/factures/{id}/create-payment-session",
+  "UpstreamHttpMethod": [ "POST" ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer",
+    "AllowedScopes": []
+  }
+},
+{
+  "DownstreamPathTemplate": "/api/interventions/factures/{id}/mock-checkout",
+  "DownstreamScheme": "https",
+  "DownstreamHostAndPorts": [
+    {
+      "Host": "localhost",
+      "Port": 7228
+    }
+  ],
+  "UpstreamPathTemplate": "/apigateway/interventions/factures/{id}/mock-checkout",
+  "UpstreamHttpMethod": [ "GET" ]
+},
+{
+  "DownstreamPathTemplate": "/api/interventions/factures/{id}/confirm-payment",
+  "DownstreamScheme": "https",
+  "DownstreamHostAndPorts": [
+    {
+      "Host": "localhost",
+      "Port": 7228
+    }
+  ],
+  "UpstreamPathTemplate": "/apigateway/interventions/factures/{id}/confirm-payment",
+  "UpstreamHttpMethod": [ "POST" ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer",
+    "AllowedScopes": []
+  }
+}
+    ,
 
     // ========== TECHNICIENS ========== 
     {

@@ -941,5 +941,102 @@ namespace InterventionAPI.Controllers
                 return StatusCode(500, "Erreur serveur");
             }
         }
+
+        // POST: api/interventions/factures/1/create-payment-session
+[HttpPost("factures/{id}/create-payment-session")]
+public IActionResult CreatePaymentSession(int id)
+{
+    try
+    {
+        var facture = _repository.GetFactureById(id);
+        if (facture == null)
+            return NotFound(new { message = $"Facture {id} non trouvée" });
+
+        if (string.Equals(facture.Statut, "Payée", StringComparison.OrdinalIgnoreCase))
+            return BadRequest(new { message = "Facture déjà payée" });
+
+        // Retourner l'URL du frontend checkout (dev) pour que l'application client gère l'UI
+        // Dans votre environnement de dev, le frontend Vite tourne souvent sur le port 5173
+        var frontendBase = "https://localhost:5173";
+        var checkoutUrl = $"{frontendBase}/checkout?factureId={id}";
+
+        return Ok(new { url = checkoutUrl });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Erreur lors de la création de session de paiement pour la facture {id}");
+        return StatusCode(500, new { message = "Erreur serveur" });
+    }
+}
+
+
+
+// POST: api/interventions/factures/1/confirm-payment
+[HttpPost("factures/{id}/confirm-payment")]
+public IActionResult ConfirmPayment(int id)
+{
+    try
+    {
+        var facture = _repository.GetFactureById(id);
+        if (facture == null)
+            return NotFound(new { message = "Facture introuvable" });
+
+        if (string.Equals(facture.Statut, "Payée", StringComparison.OrdinalIgnoreCase))
+            return BadRequest(new { message = "Facture déjà payée" });
+
+        facture.Statut = "Payée";
+        facture.DatePaiement = DateTime.UtcNow;
+        facture.ModePaiement = "En ligne (simulé)";
+
+        var updated = _repository.UpdateFacture(facture);
+
+        // Notifier le client par email/notification
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var intervention = _repository.GetById(facture.InterventionId);
+                if (intervention != null)
+                {
+                    var reclResp = await _httpClient.GetAsync($"{ClientApiBase}/reclamations/{intervention.ReclamationId}");
+                    if (reclResp.IsSuccessStatusCode)
+                    {
+                        var reclJson = await reclResp.Content.ReadAsStringAsync();
+                        var reclDoc = System.Text.Json.JsonDocument.Parse(reclJson);
+                        if (reclDoc.RootElement.TryGetProperty("clientId", out var cidEl))
+                        {
+                            var email = await GetClientEmailAsync(cidEl.GetInt32());
+                            if (!string.IsNullOrWhiteSpace(email))
+                            {
+                                await TrySendNotificationAsync(email, 
+                                    "Paiement confirmé", 
+                                    $"Votre paiement pour la facture {facture.NumeroFacture} a été confirmé avec succès. Merci!");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Erreur lors de la notification après paiement");
+            }
+        });
+
+        return Ok(new { 
+            message = "Paiement confirmé", 
+            facture = new {
+                facture.Id,
+                facture.NumeroFacture,
+                facture.Statut,
+                facture.DatePaiement
+            }
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Erreur lors de la confirmation du paiement pour la facture {id}");
+        return StatusCode(500, new { message = "Erreur serveur" });
+    }
+}
     }
 }

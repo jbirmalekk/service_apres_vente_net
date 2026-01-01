@@ -5,6 +5,7 @@ using AuthAPI.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using System.Web;
 
 namespace AuthAPI.Controllers
 {
@@ -16,6 +17,7 @@ namespace AuthAPI.Controllers
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
         private readonly ILogger<AuthController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -25,6 +27,7 @@ namespace AuthAPI.Controllers
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration,
             ILogger<AuthController> logger,
+            IEmailService emailService,
             IHttpClientFactory httpClientFactory)
         {
             _authService = authService;
@@ -32,6 +35,7 @@ namespace AuthAPI.Controllers
             _userManager = userManager;
             _configuration = configuration;
             _logger = logger;
+            _emailService = emailService;
             _httpClientFactory = httpClientFactory;
         }
 
@@ -288,12 +292,28 @@ namespace AuthAPI.Controllers
 
             try
             {
-                var success = await _authService.ResetPasswordAsync(model);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || !user.IsActive)
+                {
+                    // Pour des raisons de sécurité, on retourne toujours OK même si l'email n'existe pas
+                    return Ok(new
+                    {
+                        message = "Si un compte avec cet email existe, un lien de réinitialisation a été envoyé."
+                    });
+                }
 
-                // Pour des raisons de sécurité, on retourne toujours OK même si l'email n'existe pas
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var encodedToken = HttpUtility.UrlEncode(token);
+
+                await _emailService.SendPasswordResetEmailAsync(
+                    user.Email,
+                    user.FirstName,
+                    encodedToken
+                );
+
                 return Ok(new
                 {
-                    message = "If an account with that email exists, a password reset link has been sent."
+                    message = "Si un compte avec cet email existe, un lien de réinitialisation a été envoyé."
                 });
             }
             catch (Exception ex)
@@ -302,7 +322,7 @@ namespace AuthAPI.Controllers
             }
         }
 
-        [HttpPost("reset-password")]
+       [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordConfirmModel model)
         {
             if (!ModelState.IsValid)
@@ -310,18 +330,119 @@ namespace AuthAPI.Controllers
 
             try
             {
-                var success = await _authService.ResetPasswordConfirmAsync(model);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || !user.IsActive)
+                    return BadRequest(new { message = "Utilisateur non trouvé ou compte désactivé" });
 
-                if (!success)
-                    return BadRequest(new { message = "Password reset failed. The token may be invalid or expired." });
+                // Décoder le token
+                var decodedToken = HttpUtility.UrlDecode(model.Token);
 
-                return Ok(new { message = "Password has been reset successfully" });
+                var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    user.LastPasswordChange = DateTime.UtcNow;
+                    user.FailedLoginAttempts = 0;
+                    user.LockoutEnd = null;
+                    await _userManager.UpdateAsync(user);
+
+                    // Envoyer un email de confirmation
+                    await _emailService.SendWelcomeEmailAsync(user.Email, user.FirstName);
+
+                    return Ok(new { message = "Mot de passe réinitialisé avec succès" });
+                }
+
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { message = $"Échec de la réinitialisation: {errors}" });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                    return BadRequest(new { message = "Utilisateur non trouvé" });
+
+                if (user.EmailConfirmed)
+                    return BadRequest(new { message = "Cet email est déjà confirmé" });
+
+                // Décoder le token
+                var decodedToken = HttpUtility.UrlDecode(model.Token);
+
+                var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+                if (result.Succeeded)
+                {
+                    user.EmailConfirmed = true;
+                    await _userManager.UpdateAsync(user);
+
+                    // Envoyer un email de bienvenue
+                    await _emailService.SendWelcomeEmailAsync(user.Email, user.FirstName);
+
+                    return Ok(new { message = "Email confirmé avec succès" });
+                }
+
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { message = $"Échec de la confirmation: {errors}" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("resend-confirmation-email")]
+        public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    // Pour des raisons de sécurité, retourner toujours OK
+                    return Ok(new { message = "Si un compte avec cet email existe, un email de confirmation a été envoyé." });
+                }
+
+                if (user.EmailConfirmed)
+                {
+                    return BadRequest(new { message = "Cet email est déjà confirmé" });
+                }
+
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encodedToken = HttpUtility.UrlEncode(token);
+                
+                var frontendUrl = _configuration["Frontend:BaseUrl"] ?? "http://localhost:5173";
+                var confirmPath = _configuration["Frontend:ConfirmEmailPath"] ?? "/confirm-email";
+                
+                var confirmationLink = $"{frontendUrl}{confirmPath}?token={encodedToken}&email={HttpUtility.UrlEncode(user.Email)}";
+                
+                await _emailService.SendEmailConfirmationAsync(
+                    user.Email,
+                    user.FirstName,
+                    confirmationLink
+                );
+
+                return Ok(new { message = "Email de confirmation envoyé avec succès" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpPost("toggle-user/{userId}")]
