@@ -66,7 +66,11 @@ namespace ClientAPI.Migrations
                         {
                             Id = 1,
                             Adresse = "Tunis, Tunisie",
+<<<<<<< HEAD
                             DateInscription = new DateTime(2026, 1, 1, 17, 11, 20, 854, DateTimeKind.Local).AddTicks(3293),
+=======
+                            DateInscription = new DateTime(2025, 12, 30, 1, 25, 50, 124, DateTimeKind.Local).AddTicks(5117),
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
                             Email = "mohamed@example.com",
                             Nom = "Mohamed Ben Ali",
                             Telephone = "12345678"
@@ -75,7 +79,11 @@ namespace ClientAPI.Migrations
                         {
                             Id = 2,
                             Adresse = "Sousse, Tunisie",
+<<<<<<< HEAD
                             DateInscription = new DateTime(2026, 1, 1, 17, 11, 20, 854, DateTimeKind.Local).AddTicks(3321),
+=======
+                            DateInscription = new DateTime(2025, 12, 30, 1, 25, 50, 124, DateTimeKind.Local).AddTicks(5196),
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
                             Email = "fatma@example.com",
                             Nom = "Fatma Ahmed",
                             Telephone = "87654321"

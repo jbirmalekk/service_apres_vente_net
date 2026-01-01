@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { factureService } from '../services/factureService';
+<<<<<<< HEAD
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '../utils/stripe';
+=======
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
 import {
   Container,
   Paper,
@@ -13,6 +16,7 @@ import {
   FormControlLabel,
   Radio,
   Button,
+<<<<<<< HEAD
   Divider,
   CircularProgress,
   Box,
@@ -24,6 +28,17 @@ import {
 import CloseRounded from '@mui/icons-material/CloseRounded';
 import Payment from '@mui/icons-material/Payment';
 import StripePaymentForm from '../components/StripePaymentForm';
+=======
+  Stack,
+  Divider,
+  CircularProgress,
+  Alert,
+  Box,
+  Chip,
+  IconButton,
+} from '@mui/material';
+import CloseRounded from '@mui/icons-material/CloseRounded';
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
 
 const CheckoutPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -32,12 +47,19 @@ const CheckoutPage: React.FC = () => {
 
   const [facture, setFacture] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [method, setMethod] = useState<'stripe' | 'adomicile'>('stripe');
   const [payer, setPayer] = useState({ firstName: '', lastName: '', phone: '', address: '' });
   const [card, setCard] = useState({ number: '', cvv: '' });
   const [status, setStatus] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [stripeReady, setStripeReady] = useState(false);
+=======
+  const [method, setMethod] = useState<'paypal' | 'adomicile'>('paypal');
+  const [payer, setPayer] = useState({ firstName: '', lastName: '', phone: '', address: '' });
+  const [card, setCard] = useState({ number: '', cvv: '' });
+  const [status, setStatus] = useState<string | null>(null);
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
 
   useEffect(() => {
     if (!factureId) return;
@@ -72,6 +94,7 @@ const CheckoutPage: React.FC = () => {
     }
   }, [factureId]);
 
+<<<<<<< HEAD
   // Create Stripe PaymentIntent when method is stripe
   useEffect(() => {
     if (method === 'stripe' && factureId && !clientSecret) {
@@ -100,13 +123,18 @@ const CheckoutPage: React.FC = () => {
     }
   }, [method, factureId, clientSecret]);
 
+=======
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
   if (!factureId) return <Container sx={{ py: 6 }}>FactureId manquant dans l'URL.</Container>;
   if (loading) return <Container sx={{ py: 6, textAlign: 'center' }}><CircularProgress /></Container>;
   if (!facture) return <Container sx={{ py: 6 }}>Facture introuvable.</Container>;
 
+<<<<<<< HEAD
   const amount = facture.MontantTTC ?? facture.montantTTC ?? 0;
   const amountFormatted = typeof amount === 'number' ? amount.toFixed(2) : String(amount);
 
+=======
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('Traitement...');
@@ -119,6 +147,7 @@ const CheckoutPage: React.FC = () => {
       if (method === 'paypal') payload.card = card;
 
       await factureService.confirmPayment(factureId, payload);
+<<<<<<< HEAD
       setStatus('✅ Paiement confirmé avec succès !');
       setTimeout(() => {
         // Redirection vers la page des factures avec un message de succès
@@ -126,10 +155,17 @@ const CheckoutPage: React.FC = () => {
       }, 1500);
     } catch (err: any) {
       setStatus('❌ Erreur: ' + (err.message || err));
+=======
+      setStatus('Paiement confirmé !');
+      setTimeout(() => navigate('/factures'), 900);
+    } catch (err: any) {
+      setStatus('Erreur: ' + (err.message || err));
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
     }
   };
 
   return (
+<<<<<<< HEAD
     <Container maxWidth="lg" sx={{ py: 6, display: 'flex', justifyContent: 'center', minHeight: '90vh', alignItems: 'center' }}>
       <Paper sx={{ maxWidth: 960, width: '100%', borderRadius: 4, boxShadow: '0 20px 60px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
         <Box component="form" onSubmit={onSubmit}>
@@ -144,10 +180,22 @@ const CheckoutPage: React.FC = () => {
               </Typography>
             </Box>
             <IconButton onClick={() => navigate('/factures')} size="small" sx={{ color: 'text.secondary' }}>
+=======
+    <Container maxWidth="lg" sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>
+      <Paper sx={{ width: 760, borderRadius: 3, boxShadow: '0 20px 50px rgba(16,24,40,0.12)', position: 'relative', overflow: 'visible' }}>
+        <Box sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box>
+              <Typography variant="h6">Détail facture {facture.NumeroFacture}</Typography>
+              <Typography variant="caption" color="text.secondary">Date : {facture.DateCreation || facture.Date || ''}</Typography>
+            </Box>
+            <IconButton onClick={() => navigate('/factures')} size="small">
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
               <CloseRounded />
             </IconButton>
           </Box>
 
+<<<<<<< HEAD
           {/* Full-Width Summary Section */}
           <Box sx={{ bgcolor: 'grey.50', px: 4, py: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
             <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 1.2, mb: 2, display: 'block' }}>
@@ -277,11 +325,39 @@ const CheckoutPage: React.FC = () => {
                 </Grid>
               )}
             </Grid>
+=======
+          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Chip label={facture.Statut || 'En attente'} color="warning" sx={{ fontWeight: 700 }} />
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="subtitle2" color="success.main">Montant TTC</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 800 }}>{facture.MontantTTC?.toFixed(2)} €</Typography>
+              <Typography variant="caption" color="text.secondary">{(facture.MontantHT || '') + (facture.TVA ? ` • TVA ${facture.TVA}%` : '')}</Typography>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box sx={{ textAlign: 'center', py: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Informations client</Typography>
+            <Typography variant="body1" sx={{ mt: 1 }}>{facture.ClientNom}</Typography>
+            <Typography variant="body2" color="text.secondary">{facture.ClientEmail || ''}</Typography>
+            <Typography variant="body2" color="text.secondary">{facture.ClientVille || ''}</Typography>
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button variant="contained" color="success" onClick={() => { /* keep existing flow: open form area */ }} sx={{ borderRadius: 3, px: 3, py: 1.2, boxShadow: '0 8px 24px rgba(16,185,129,0.18)' }}>Payer</Button>
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
           </Box>
         </Box>
       </Paper>
     </Container>
   );
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
 
 export default CheckoutPage;

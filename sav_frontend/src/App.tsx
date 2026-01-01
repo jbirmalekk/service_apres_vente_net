@@ -69,6 +69,10 @@ function AppContent() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
           <Route path="confirm-email" element={<ConfirmEmail />} />
+<<<<<<< HEAD
+=======
+          <Route path="/checkout" element={<CheckoutPage />} />
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
         </Route>
 
         {/* Checkout page uses a minimal standalone route (no AuthLayout) to render a simple centered form */}

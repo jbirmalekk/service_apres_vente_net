@@ -493,6 +493,7 @@ const FactureForm: React.FC<Props> = ({ open, interventions, facture, prefillInt
         if (resolved && resolved.id) clientIdNum = resolved.id;
       } catch {}
 
+<<<<<<< HEAD
       // Set datePaiement if status is changed to "Payée" and no date exists
       let datePaiement = form.datePaiement || facture?.datePaiement;
       if (form.statut === 'Payée' && !datePaiement) {
@@ -501,6 +502,9 @@ const FactureForm: React.FC<Props> = ({ open, interventions, facture, prefillInt
 
       const payload: Partial<Facture> = {
         id: facture?.id, // Include ID for updates
+=======
+      const payload: Partial<Facture> = {
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
         interventionId: Number(form.interventionId),
         numeroFacture: form.numeroFacture,
         dateFacture: form.dateFacture ? `${form.dateFacture}T00:00:00` : new Date().toISOString(),
@@ -510,9 +514,15 @@ const FactureForm: React.FC<Props> = ({ open, interventions, facture, prefillInt
         montantHT: Number(form.montantHT) || 0,
         tva: Number(form.tva) || 0.19,
         statut: form.statut || 'En attente',
+<<<<<<< HEAD
         datePaiement: datePaiement,
         descriptionServices: form.descriptionServices,
         modePaiement: form.modePaiement,
+=======
+        descriptionServices: form.descriptionServices,
+        modePaiement: form.modePaiement,
+        clientId: clientIdNum,
+>>>>>>> cee27030d3d04a518224c290aab9f331afc95ead
       };
 
       console.debug('FactureForm: creating payload', payload);
